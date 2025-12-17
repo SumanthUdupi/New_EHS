@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHS Management System - Professional Prototype</title>
+    <style>
+        /* --- CSS Variables & Reset --- */
+        :root {
+            /* Colors */
+            --primary-color: #0056b3; /* Professional Blue */
+            --primary-dark: #004494;
+            --secondary-color: #28a745; /* Success Green */
+            --warning-color: #ffc107; /* Warning Yellow */
+            --danger-color: #dc3545; /* Danger Red */
+            --info-color: #17a2b8;
+            --light-gray: #f8f9fa;
+            --medium-gray: #dee2e6;
+            --dark-gray: #343a40;
+            --text-color: #333;
+            --text-muted: #6c757d;
+            --white: #ffffff;
+            --sidebar-width: 250px;
+            --header-height: 60px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Layout --- */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-gray);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100%;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0,0,0,0.2);
+            font-weight: bold;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding-top: 20px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            width: 100%;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #adb5bd;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--white);
+            background-color: rgba(255,255,255,0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .nav-icon {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #adb5bd;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        /* Header */
+        .top-header {
+            height: var(--header-height);
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Page Content */
+        .content-area {
+            padding: 30px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        /* --- Components --- */
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--medium-gray);
+            padding-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: var(--white);
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            color: var(--white);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--medium-gray);
+            color: var(--text-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--light-gray);
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+        }
+
+        /* Grid System */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .data-table th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .data-table tbody tr:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0,86,179,0.2);
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success { background-color: #d4edda; color: #155724; }
+        .badge-warning { background-color: #fff3cd; color: #856404; }
+        .badge-danger { background-color: #f8d7da; color: #721c24; }
+        .badge-info { background-color: #d1ecf1; color: #0c5460; }
+        .badge-secondary { background-color: #e2e3e5; color: #383d41; }
+
+        .badge-high { background-color: #f8d7da; color: #721c24; }
+        .badge-medium { background-color: #fff3cd; color: #856404; }
+        .badge-low { background-color: #d4edda; color: #155724; }
+
+        /* Modals */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 600px;
+            max-width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 0; /* Reset for card style inside */
+        }
+
+        /* Views */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Risk Matrix Styles */
+        .risk-matrix {
+            border-collapse: collapse;
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .risk-matrix td, .risk-matrix th {
+            border: 1px solid #fff;
+            padding: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        .rm-header { background: #333; color: white !important; }
+        .rm-low { background-color: #28a745; }
+        .rm-med { background-color: #ffc107; color: #333 !important; }
+        .rm-high { background-color: #dc3545; }
+        .rm-label { background: transparent; color: #333 !important; text-align: right; border: none !important; font-weight: normal; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .card {
+                padding: 15px;
+            }
+            .content-area {
+                padding: 15px;
+            }
+            .user-name {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            EHS MASTER
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" onclick="app.navigateTo('dashboard'); return false;">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="app.navigateTo('incidents'); return false;">
+                    <span class="nav-icon">⚠️</span> Incidents
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="app.navigateTo('risk'); return false;">
+                    <span class="nav-icon">🛡️</span> Risk Assessment
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="app.navigateTo('audits'); return false;">
+                    <span class="nav-icon">📋</span> Inspections
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="app.navigateTo('training'); return false;">
+                    <span class="nav-icon">🎓</span> Training
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            v1.0.0 Prototype
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" onclick="app.toggleSidebar()" aria-label="Toggle Navigation">☰</button>
+                <div class="header-title" id="page-title">Dashboard</div>
+            </div>
+            <div class="user-profile">
+                <span class="user-name">John Doe (EHS Manager)</span>
+                <div class="user-avatar">JD</div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+
+            <!-- DASHBOARD VIEW -->
+            <section id="dashboard-view" class="view-section active">
+                <div class="grid-4">
+                    <div class="card">
+                        <div class="card-title">Total Incidents</div>
+                        <h2 id="dash-total-incidents">0</h2>
+                        <small class="text-muted">Year to Date</small>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Open Risks</div>
+                        <h2 id="dash-open-risks">0</h2>
+                        <small class="text-muted">High Priority</small>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Audit Score</div>
+                        <h2 id="dash-compliance">0%</h2>
+                        <small class="text-muted">Average Compliance</small>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Training Status</div>
+                        <h2 id="dash-training-due">0</h2>
+                        <small class="text-muted">Certifications Expiring</small>
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-top: 20px;">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Incident Type Distribution</span>
+                        </div>
+                        <div id="incident-chart" style="height: 250px; background: #f9f9f9; display: flex; align-items: flex-end; justify-content: space-around; padding: 20px; border-radius: 4px;">
+                            <!-- Chart rendered by JS -->
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Recent Activity Log</span>
+                        </div>
+                        <div id="recent-activity-list" style="max-height: 250px; overflow-y: auto;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- INCIDENTS VIEW -->
+            <section id="incidents-view" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Incident Management</span>
+                        <button class="btn btn-primary" onclick="app.showIncidentForm()">+ Report New Incident</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incident-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- INCIDENT FORM MODAL (Report) -->
+            <div id="incident-form-modal" class="modal-overlay">
+                <div class="modal-content card">
+                    <div class="card-header">
+                        <span class="card-title">Report Incident</span>
+                        <button class="btn btn-outline btn-sm" onclick="app.closeIncidentForm()">X</button>
+                    </div>
+                    <form id="incident-form" onsubmit="app.submitIncident(event)">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Date & Time</label>
+                                <input type="datetime-local" class="form-control" name="datetime" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Type</label>
+                                <select class="form-control" name="type" required>
+                                    <option value="Injury">Injury</option>
+                                    <option value="Near Miss">Near Miss</option>
+                                    <option value="Property Damage">Property Damage</option>
+                                    <option value="Environmental">Environmental</option>
+                                    <option value="Security">Security</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3" required placeholder="Describe what happened..."></textarea>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Severity</label>
+                                <select class="form-control" name="severity">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Location</label>
+                                <input type="text" class="form-control" name="location" required placeholder="e.g. Warehouse B">
+                            </div>
+                        </div>
+                        <div style="text-align: right; margin-top: 10px;">
+                            <button type="button" class="btn btn-outline" onclick="app.closeIncidentForm()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+             <!-- INCIDENT INVESTIGATION MODAL -->
+             <div id="investigation-modal" class="modal-overlay">
+                <div class="modal-content card" style="width: 700px;">
+                    <div class="card-header">
+                        <span class="card-title">Incident Investigation & Closure</span>
+                        <button class="btn btn-outline btn-sm" onclick="app.closeInvestigationModal()">X</button>
+                    </div>
+                    <div id="investigation-details" style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                        <!-- Details injected by JS -->
+                    </div>
+                    <form id="investigation-form" onsubmit="app.submitInvestigation(event)">
+                        <input type="hidden" name="incidentId" id="inv-incident-id">
+                        <div class="form-group">
+                            <label class="form-label">Root Cause Analysis</label>
+                            <textarea class="form-control" name="rootCause" rows="3" placeholder="Identify the root cause (e.g., using 5 Whys)..." required></textarea>
+                        </div>
+                         <div class="form-group">
+                            <label class="form-label">Corrective Actions (CAPA)</label>
+                            <textarea class="form-control" name="capa" rows="2" placeholder="Actions taken to prevent recurrence..." required></textarea>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Investigator</label>
+                                <input type="text" class="form-control" name="investigator" value="John Doe" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Status Update</label>
+                                <select class="form-control" name="status">
+                                    <option value="Investigating">Investigating</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="text-align: right; margin-top: 10px;">
+                            <button type="button" class="btn btn-outline" onclick="app.closeInvestigationModal()">Cancel</button>
+                            <button type="submit" class="btn btn-success">Save & Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RISK VIEW -->
+            <section id="risk-view" class="view-section">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Risk Register</span>
+                            <button class="btn btn-primary btn-sm" onclick="app.showRiskForm()">+ Add Assessment</button>
+                        </div>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Hazard</th>
+                                        <th>Score</th>
+                                        <th>Controls</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="risk-table-body">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Risk Matrix Heatmap</span>
+                        </div>
+                        <div style="padding: 10px;">
+                            <table class="risk-matrix">
+                                <tr>
+                                    <td class="rm-label" rowspan="6" style="writing-mode: vertical-rl; transform: rotate(180deg); text-align: center;">Likelihood</td>
+                                    <td class="rm-header">5</td>
+                                    <td class="rm-med" id="cell-5-1">M</td>
+                                    <td class="rm-med" id="cell-5-2">M</td>
+                                    <td class="rm-high" id="cell-5-3">H</td>
+                                    <td class="rm-high" id="cell-5-4">H</td>
+                                    <td class="rm-high" id="cell-5-5">H</td>
+                                </tr>
+                                <tr>
+                                    <td class="rm-header">4</td>
+                                    <td class="rm-low" id="cell-4-1">L</td>
+                                    <td class="rm-med" id="cell-4-2">M</td>
+                                    <td class="rm-med" id="cell-4-3">M</td>
+                                    <td class="rm-high" id="cell-4-4">H</td>
+                                    <td class="rm-high" id="cell-4-5">H</td>
+                                </tr>
+                                <tr>
+                                    <td class="rm-header">3</td>
+                                    <td class="rm-low" id="cell-3-1">L</td>
+                                    <td class="rm-med" id="cell-3-2">M</td>
+                                    <td class="rm-med" id="cell-3-3">M</td>
+                                    <td class="rm-med" id="cell-3-4">M</td>
+                                    <td class="rm-high" id="cell-3-5">H</td>
+                                </tr>
+                                <tr>
+                                    <td class="rm-header">2</td>
+                                    <td class="rm-low" id="cell-2-1">L</td>
+                                    <td class="rm-low" id="cell-2-2">L</td>
+                                    <td class="rm-med" id="cell-2-3">M</td>
+                                    <td class="rm-med" id="cell-2-4">M</td>
+                                    <td class="rm-med" id="cell-2-5">M</td>
+                                </tr>
+                                <tr>
+                                    <td class="rm-header">1</td>
+                                    <td class="rm-low" id="cell-1-1">L</td>
+                                    <td class="rm-low" id="cell-1-2">L</td>
+                                    <td class="rm-low" id="cell-1-3">L</td>
+                                    <td class="rm-low" id="cell-1-4">L</td>
+                                    <td class="rm-med" id="cell-1-5">M</td>
+                                </tr>
+                                <tr>
+                                    <td class="rm-label"></td>
+                                    <td class="rm-label">1</td>
+                                    <td class="rm-label">2</td>
+                                    <td class="rm-label">3</td>
+                                    <td class="rm-label">4</td>
+                                    <td class="rm-label">5</td>
+                                </tr>
+                                <tr>
+                                    <td class="rm-label"></td>
+                                    <td class="rm-label"></td>
+                                    <td class="rm-label" colspan="5" style="text-align: center;">Severity</td>
+                                </tr>
+                            </table>
+                            <div style="margin-top:10px; text-align:center; font-size:0.8rem; color: #666;">
+                                Numbers in cells indicate count of risks
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RISK FORM MODAL -->
+             <div id="risk-form-modal" class="modal-overlay">
+                <div class="modal-content card">
+                    <div class="card-header">
+                        <span class="card-title">New Risk Assessment</span>
+                        <button class="btn btn-outline btn-sm" onclick="app.closeRiskForm()">X</button>
+                    </div>
+                    <form id="risk-form" onsubmit="app.submitRisk(event)">
+                        <div class="form-group">
+                            <label class="form-label">Hazard Description</label>
+                            <input type="text" class="form-control" name="hazard" required placeholder="e.g. Chemical spill">
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Likelihood (1-5)</label>
+                                <select class="form-control" name="likelihood" required onchange="app.calculateRiskScore()">
+                                    <option value="1">1 - Rare</option>
+                                    <option value="2">2 - Unlikely</option>
+                                    <option value="3">3 - Possible</option>
+                                    <option value="4">4 - Likely</option>
+                                    <option value="5">5 - Almost Certain</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Severity (1-5)</label>
+                                <select class="form-control" name="severity" required onchange="app.calculateRiskScore()">
+                                    <option value="1">1 - Negligible</option>
+                                    <option value="2">2 - Minor</option>
+                                    <option value="3">3 - Moderate</option>
+                                    <option value="4">4 - Major</option>
+                                    <option value="5">5 - Catastrophic</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Risk Score: <span id="risk-score-display" style="font-weight:bold;">1</span></label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Control Measures</label>
+                            <textarea class="form-control" name="controls" rows="3" required placeholder="Mitigation strategies..."></textarea>
+                        </div>
+                        <div style="text-align: right; margin-top: 10px;">
+                            <button type="button" class="btn btn-outline" onclick="app.closeRiskForm()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Assessment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- AUDITS VIEW -->
+            <section id="audits-view" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Inspections & Audits</span>
+                        <button class="btn btn-primary" onclick="app.startAudit()">+ Start New Inspection</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Auditor</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- AUDIT EXECUTION MODAL -->
+            <div id="audit-execution-modal" class="modal-overlay">
+                 <div class="modal-content card" style="width: 700px;">
+                    <div class="card-header">
+                        <span class="card-title">Workplace Safety Inspection</span>
+                        <button class="btn btn-outline btn-sm" onclick="app.closeAuditForm()">X</button>
+                    </div>
+                    <div id="audit-questions">
+                        <!-- Questions injected by JS -->
+                    </div>
+                    <!-- Evidence Upload Simulation -->
+                    <div class="form-group" style="padding: 10px; border-top: 1px solid #eee;">
+                        <label class="form-label">Photo Evidence / Attachments</label>
+                        <input type="file" class="form-control" multiple>
+                        <small class="text-muted">Upload photos of non-conformances</small>
+                    </div>
+                     <div style="text-align: right; margin-top: 20px;">
+                        <button class="btn btn-outline" onclick="app.closeAuditForm()">Cancel</button>
+                        <button class="btn btn-primary" onclick="app.submitAudit()">Complete Inspection</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRAINING VIEW -->
+            <section id="training-view" class="view-section">
+                 <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Training Records</span>
+                        <button class="btn btn-primary btn-sm" onclick="app.showTrainingForm()">+ Assign Training</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Role</th>
+                                <th>Course</th>
+                                <th>Completion Date</th>
+                                <th>Expiry</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="training-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TRAINING ASSIGN MODAL -->
+            <div id="training-form-modal" class="modal-overlay">
+                <div class="modal-content card">
+                    <div class="card-header">
+                        <span class="card-title">Assign / Record Training</span>
+                        <button class="btn btn-outline btn-sm" onclick="app.closeTrainingForm()">X</button>
+                    </div>
+                    <form id="training-form" onsubmit="app.submitTraining(event)">
+                        <div class="form-group">
+                            <label class="form-label">Employee Name</label>
+                            <input type="text" class="form-control" name="employee" required placeholder="John Smith">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Training Course</label>
+                            <select class="form-control" name="course" required>
+                                <option value="Fire Safety">Fire Safety</option>
+                                <option value="First Aid">First Aid</option>
+                                <option value="Forklift Certification">Forklift Certification</option>
+                                <option value="Hazard Communication">Hazard Communication</option>
+                                <option value="Lockout/Tagout">Lockout/Tagout</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="date" class="form-control" name="expiry" required>
+                        </div>
+                        <div style="text-align: right; margin-top: 20px;">
+                            <button type="button" class="btn btn-outline" onclick="app.closeTrainingForm()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Assign & Record</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    // --- DATA MODULE (Simulated Backend) ---
+    const Data = {
+        incidents: [],
+        risks: [],
+        audits: [],
+        trainings: [],
+
+        init: function() {
+            this.incidents = this.generateIncidents();
+            this.risks = this.generateRisks();
+            this.audits = this.generateAudits();
+            this.trainings = this.generateTrainings();
+        },
+
+        generateIncidents: function() {
+            return [
+                { id: 101, date: '2023-10-01', type: 'Injury', description: 'Slip on wet floor in warehouse', severity: 'Medium', status: 'Closed', location: 'Warehouse A', rootCause: 'Leaking pipe', capa: 'Pipe fixed, floor mats installed' },
+                { id: 102, date: '2023-10-05', type: 'Near Miss', description: 'Forklift almost hit racking', severity: 'High', status: 'Open', location: 'Loading Bay' },
+                { id: 103, date: '2023-10-12', type: 'Environmental', description: 'Minor oil spill in parking lot', severity: 'Low', status: 'Closed', location: 'Parking Lot', rootCause: 'Old vehicle leak', capa: 'Cleanup kit used' },
+                { id: 104, date: '2023-10-15', type: 'Property Damage', description: 'Broken window in lobby', severity: 'Low', status: 'Closed', location: 'Reception', rootCause: 'High winds', capa: 'Replaced with tempered glass' },
+                { id: 105, date: '2023-10-20', type: 'Injury', description: 'Cut finger on sharp edge', severity: 'Medium', status: 'Investigating', location: 'Assembly Line' },
+                { id: 106, date: '2023-10-22', type: 'Security', description: 'Unauthorized entry attempted', severity: 'High', status: 'Open', location: 'Gate 2' },
+                { id: 107, date: '2023-10-25', type: 'Near Miss', description: 'Box fell from shelf', severity: 'Medium', status: 'Open', location: 'Storage Room' },
+                { id: 108, date: '2023-10-28', type: 'Environmental', description: 'Improper waste disposal', severity: 'Low', status: 'Investigating', location: 'Cafeteria' },
+                { id: 109, date: '2023-11-01', type: 'Injury', description: 'Back strain from lifting', severity: 'Medium', status: 'Open', location: 'Shipping' },
+                { id: 110, date: '2023-11-03', type: 'Property Damage', description: 'Door handle broken', severity: 'Low', status: 'Closed', location: 'Office 3' },
+            ];
+        },
+
+        generateRisks: function() {
+            return [
+                { id: 'R001', hazard: 'Working at height', likelihood: 3, severity: 4, score: 12, controls: 'Harness, Guardrails' },
+                { id: 'R002', hazard: 'Chemical handling', likelihood: 2, severity: 4, score: 8, controls: 'PPE, Ventilation' },
+                { id: 'R003', hazard: 'Manual lifting', likelihood: 4, severity: 2, score: 8, controls: 'Lifting training, Trolleys' },
+                { id: 'R004', hazard: 'Noise exposure', likelihood: 5, severity: 2, score: 10, controls: 'Ear protection, Enclosures' },
+                { id: 'R005', hazard: 'Electrical Faults', likelihood: 2, severity: 5, score: 10, controls: 'Regular testing, LOTO' },
+                { id: 'R006', hazard: 'Slips, Trips, Falls', likelihood: 4, severity: 2, score: 8, controls: 'Housekeeping, Signage' },
+                { id: 'R007', hazard: 'Vehicle Collision', likelihood: 2, severity: 5, score: 10, controls: 'Traffic plan, Speed limits' },
+                { id: 'R008', hazard: 'Dust Inhalation', likelihood: 3, severity: 3, score: 9, controls: 'Masks, Extraction' },
+                { id: 'R009', hazard: 'Confined Space', likelihood: 1, severity: 5, score: 5, controls: 'Permit system, Gas monitoring' },
+            ];
+        },
+
+        generateAudits: function() {
+            return [
+                { id: 1, date: '2023-09-01', type: 'Monthly Safety', auditor: 'Jane Smith', score: '95%', status: 'Completed' },
+                { id: 2, date: '2023-10-01', type: 'Fire Safety', auditor: 'John Doe', score: '88%', status: 'Completed' },
+                { id: 3, date: '2023-10-15', type: 'Electrical', auditor: 'Mike Ross', score: '92%', status: 'Completed' },
+            ];
+        },
+
+        generateTrainings: function() {
+            return [
+                 { employee: 'Alice Johnson', role: 'Operator', course: 'Fire Safety', completed: '2023-01-15', expiry: '2024-01-15', status: 'Valid' },
+                 { employee: 'Bob Wilson', role: 'Driver', course: 'Forklift Cert', completed: '2022-11-20', expiry: '2023-11-20', status: 'Expiring Soon' },
+                 { employee: 'Charlie Brown', role: 'Manager', course: 'First Aid', completed: '2023-05-10', expiry: '2025-05-10', status: 'Valid' },
+                 { employee: 'David Lee', role: 'Technician', course: 'LOTO', completed: '2023-02-01', expiry: '2024-02-01', status: 'Valid' },
+                 { employee: 'Eva Green', role: 'Operator', course: 'HazCom', completed: '2022-10-05', expiry: '2023-10-05', status: 'Expired' },
+            ];
+        }
+    };
+
+    // --- UTILS ---
+    const Utils = {
+        escapeHtml: function(unsafe) {
+            if (typeof unsafe !== 'string') return unsafe;
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+    };
+
+    // --- APP CONTROLLER ---
+    const app = {
+        state: {
+            currentView: 'dashboard'
+        },
+
+        init: function() {
+            Data.init();
+            this.renderDashboard();
+            this.renderIncidents();
+            this.renderRisks();
+            this.renderAudits();
+            this.renderTraining();
+            this.setupNavigation();
+        },
+
+        setupNavigation: function() {
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                const sidebar = document.getElementById('sidebar');
+                const toggle = document.querySelector('.menu-toggle');
+                if (window.innerWidth <= 768 &&
+                    sidebar.classList.contains('open') &&
+                    !sidebar.contains(e.target) &&
+                    !toggle.contains(e.target)) {
+                    this.toggleSidebar();
+                }
+            });
+        },
+
+        toggleSidebar: function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        },
+
+        navigateTo: function(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId + '-view').classList.add('active');
+
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            const navMap = { 'dashboard': 0, 'incidents': 1, 'risk': 2, 'audits': 3, 'training': 4 };
+            document.querySelectorAll('.nav-link')[navMap[viewId]].classList.add('active');
+
+            const titles = {
+                'dashboard': 'Dashboard',
+                'incidents': 'Incident Management',
+                'risk': 'Risk Assessment',
+                'audits': 'Inspections & Audits',
+                'training': 'Training Records'
+            };
+            document.getElementById('page-title').innerText = titles[viewId];
+
+            // Close sidebar on mobile after navigation
+            if(window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+
+            // Re-render specific views if needed
+            if(viewId === 'dashboard') this.renderDashboard();
+            if(viewId === 'risk') this.renderRiskMatrix();
+        },
+
+        // --- DASHBOARD ---
+        renderDashboard: function() {
+            document.getElementById('dash-total-incidents').innerText = Data.incidents.length;
+            document.getElementById('dash-open-risks').innerText = Data.risks.filter(r => r.score >= 10).length;
+
+            const auditScores = Data.audits.map(a => parseInt(a.score));
+            const avgScore = auditScores.length ? Math.round(auditScores.reduce((a, b) => a + b, 0) / auditScores.length) : 0;
+            document.getElementById('dash-compliance').innerText = avgScore + '%';
+
+            document.getElementById('dash-training-due').innerText = Data.trainings.filter(t => t.status === 'Expiring Soon' || t.status === 'Expired').length;
+
+            // Render Recent Activity
+            const activityList = document.getElementById('recent-activity-list');
+            activityList.innerHTML = '';
+            Data.incidents.slice(0, 5).forEach(inc => {
+                const div = document.createElement('div');
+                div.style.padding = '10px 0';
+                div.style.borderBottom = '1px solid #eee';
+                div.innerHTML = `<span class="badge badge-secondary">${Utils.escapeHtml(inc.type)}</span> <strong>${Utils.escapeHtml(inc.description)}</strong> <br> <small class="text-muted">${Utils.escapeHtml(inc.date)} - ${Utils.escapeHtml(inc.status)}</small>`;
+                activityList.appendChild(div);
+            });
+
+            this.renderChart();
+        },
+
+        renderChart: function() {
+            const chartContainer = document.getElementById('incident-chart');
+            chartContainer.innerHTML = '';
+            const types = {};
+            Data.incidents.forEach(i => types[i.type] = (types[i.type] || 0) + 1);
+
+            const maxVal = Math.max(...Object.values(types));
+
+            for (const [type, count] of Object.entries(types)) {
+                const barWrapper = document.createElement('div');
+                barWrapper.style.display = 'flex';
+                barWrapper.style.flexDirection = 'column';
+                barWrapper.style.alignItems = 'center';
+                barWrapper.style.flex = '1';
+
+                const height = (count / maxVal) * 100; // Percentage height
+
+                const bar = document.createElement('div');
+                bar.style.height = height + '%';
+                bar.style.width = '30px';
+                bar.style.backgroundColor = 'var(--primary-color)';
+                bar.style.borderRadius = '4px 4px 0 0';
+                bar.style.transition = 'height 0.5s ease';
+
+                const val = document.createElement('div');
+                val.innerText = count;
+                val.style.fontWeight = 'bold';
+                val.style.marginBottom = '5px';
+
+                const label = document.createElement('div');
+                label.innerText = type.split(' ')[0];
+                label.style.fontSize = '0.75rem';
+                label.style.marginTop = '5px';
+                label.style.textAlign = 'center';
+
+                barWrapper.appendChild(val);
+                barWrapper.appendChild(bar);
+                barWrapper.appendChild(label);
+                chartContainer.appendChild(barWrapper);
+            }
+        },
+
+        // --- INCIDENTS ---
+        renderIncidents: function() {
+            const tbody = document.getElementById('incident-table-body');
+            tbody.innerHTML = '';
+            Data.incidents.forEach(inc => {
+                const row = document.createElement('tr');
+                let badgeClass = 'badge-secondary';
+                if(inc.severity === 'High') badgeClass = 'badge-danger';
+                if(inc.severity === 'Medium') badgeClass = 'badge-warning';
+                if(inc.severity === 'Low') badgeClass = 'badge-low';
+
+                row.innerHTML = `
+                    <td>#${inc.id}</td>
+                    <td>${Utils.escapeHtml(inc.date)}</td>
+                    <td>${Utils.escapeHtml(inc.type)}</td>
+                    <td><span class="badge ${badgeClass}">${Utils.escapeHtml(inc.severity)}</span></td>
+                    <td>${Utils.escapeHtml(inc.status)}</td>
+                    <td><button class="btn btn-sm btn-outline" onclick="app.openInvestigationModal(${inc.id})">View/Edit</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        },
+
+        showIncidentForm: function() {
+            document.getElementById('incident-form-modal').style.display = 'flex';
+        },
+
+        closeIncidentForm: function() {
+            document.getElementById('incident-form-modal').style.display = 'none';
+            document.getElementById('incident-form').reset();
+        },
+
+        submitIncident: function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const newIncident = {
+                id: 100 + Data.incidents.length + 1,
+                date: formData.get('datetime').split('T')[0],
+                type: formData.get('type'),
+                description: formData.get('description'),
+                severity: formData.get('severity'),
+                location: formData.get('location'),
+                status: 'Open'
+            };
+            Data.incidents.unshift(newIncident);
+            this.renderIncidents();
+            this.renderDashboard();
+            this.closeIncidentForm();
+        },
+
+        // Investigation Logic
+        openInvestigationModal: function(id) {
+            const incident = Data.incidents.find(i => i.id === id);
+            if(!incident) return;
+
+            document.getElementById('inv-incident-id').value = incident.id;
+
+            const details = document.getElementById('investigation-details');
+            details.innerHTML = `
+                <p><strong>Incident #${incident.id}</strong> - ${Utils.escapeHtml(incident.type)}</p>
+                <p>${Utils.escapeHtml(incident.description)}</p>
+                <p>Location: ${Utils.escapeHtml(incident.location)} | Date: ${Utils.escapeHtml(incident.date)}</p>
+            `;
+
+            const form = document.getElementById('investigation-form');
+            form.rootCause.value = incident.rootCause || '';
+            form.capa.value = incident.capa || '';
+            form.status.value = incident.status;
+
+            document.getElementById('investigation-modal').style.display = 'flex';
+        },
+
+        closeInvestigationModal: function() {
+             document.getElementById('investigation-modal').style.display = 'none';
+        },
+
+        submitInvestigation: function(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('inv-incident-id').value);
+            const incident = Data.incidents.find(i => i.id === id);
+            if(incident) {
+                const formData = new FormData(e.target);
+                incident.rootCause = formData.get('rootCause');
+                incident.capa = formData.get('capa');
+                incident.status = formData.get('status');
+
+                this.renderIncidents();
+                this.renderDashboard(); // Updates lists
+                this.closeInvestigationModal();
+            }
+        },
+
+        // --- RISK ---
+        renderRisks: function() {
+            const tbody = document.getElementById('risk-table-body');
+            tbody.innerHTML = '';
+            Data.risks.forEach(risk => {
+                const row = document.createElement('tr');
+                let color = '#28a745';
+                if(risk.score >= 15) color = '#dc3545';
+                else if(risk.score >= 8) color = '#ffc107';
+
+                row.innerHTML = `
+                    <td>${Utils.escapeHtml(risk.hazard)}</td>
+                    <td><span style="font-weight:bold; color:${color}">${risk.score}</span> (L${risk.likelihood} x S${risk.severity})</td>
+                    <td>${Utils.escapeHtml(risk.controls)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            this.renderRiskMatrix();
+        },
+
+        renderRiskMatrix: function() {
+            // Reset matrix
+            for(let l=1; l<=5; l++) {
+                for(let s=1; s<=5; s++) {
+                    const cell = document.getElementById(`cell-${l}-${s}`);
+                    if(cell) {
+                         // Keep base class color but remove content
+                         cell.innerText = '';
+                    }
+                }
+            }
+
+            // Populate
+            Data.risks.forEach(risk => {
+                const cell = document.getElementById(`cell-${risk.likelihood}-${risk.severity}`);
+                if(cell) {
+                    const current = parseInt(cell.innerText) || 0;
+                    cell.innerText = current + 1;
+                    cell.style.color = '#fff'; // ensure visible
+                }
+            });
+        },
+
+        showRiskForm: function() {
+            document.getElementById('risk-form-modal').style.display = 'flex';
+        },
+
+        closeRiskForm: function() {
+            document.getElementById('risk-form-modal').style.display = 'none';
+            document.getElementById('risk-form').reset();
+            document.getElementById('risk-score-display').innerText = '1';
+        },
+
+        calculateRiskScore: function() {
+            const l = document.getElementsByName('likelihood')[0].value;
+            const s = document.getElementsByName('severity')[0].value;
+            document.getElementById('risk-score-display').innerText = l * s;
+        },
+
+        submitRisk: function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const l = parseInt(formData.get('likelihood'));
+            const s = parseInt(formData.get('severity'));
+            const newRisk = {
+                id: 'R00' + (Data.risks.length + 1),
+                hazard: formData.get('hazard'),
+                likelihood: l,
+                severity: s,
+                score: l * s,
+                controls: formData.get('controls')
+            };
+            Data.risks.push(newRisk);
+            this.renderRisks();
+            this.renderDashboard();
+            this.closeRiskForm();
+        },
+
+        // --- AUDITS ---
+        renderAudits: function() {
+            const tbody = document.getElementById('audit-table-body');
+            tbody.innerHTML = '';
+            Data.audits.forEach(audit => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${Utils.escapeHtml(audit.date)}</td>
+                    <td>${Utils.escapeHtml(audit.type)}</td>
+                    <td>${Utils.escapeHtml(audit.auditor)}</td>
+                    <td>${Utils.escapeHtml(audit.score)}</td>
+                    <td><span class="badge badge-success">${Utils.escapeHtml(audit.status)}</span></td>
+                    <td><button class="btn btn-sm btn-outline">View Report</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        },
+
+        startAudit: function() {
+             const modal = document.getElementById('audit-execution-modal');
+             const container = document.getElementById('audit-questions');
+             container.innerHTML = '';
+
+             const questions = [
+                 "Are fire extinguishers charged and accessible?",
+                 "Are emergency exits clear of obstructions?",
+                 "Are workers wearing appropriate PPE?",
+                 "Is the floor clear of trip hazards?",
+                 "Are chemical containers properly labeled?",
+                 "Is lighting adequate in all work areas?"
+             ];
+
+             questions.forEach((q, index) => {
+                 const div = document.createElement('div');
+                 div.className = 'form-group';
+                 div.style.borderBottom = '1px solid #eee';
+                 div.style.paddingBottom = '10px';
+                 div.innerHTML = `
+                    <label class="form-label">${q}</label>
+                    <div>
+                        <label><input type="radio" name="q${index}" value="Pass" checked> Pass</label>
+                        <label style="margin-left:15px"><input type="radio" name="q${index}" value="Fail"> Fail</label>
+                        <label style="margin-left:15px"><input type="radio" name="q${index}" value="NA"> N/A</label>
+                    </div>
+                 `;
+                 container.appendChild(div);
+             });
+
+             modal.style.display = 'flex';
+        },
+
+        closeAuditForm: function() {
+            document.getElementById('audit-execution-modal').style.display = 'none';
+        },
+
+        submitAudit: function() {
+            const newAudit = {
+                id: Data.audits.length + 1,
+                date: new Date().toISOString().split('T')[0],
+                type: 'Safety Walkthrough',
+                auditor: 'John Doe',
+                score: '100%',
+                status: 'Completed'
+            };
+            Data.audits.unshift(newAudit);
+            this.renderAudits();
+            this.renderDashboard();
+            this.closeAuditForm();
+        },
+
+        // --- TRAINING ---
+        renderTraining: function() {
+             const tbody = document.getElementById('training-table-body');
+            tbody.innerHTML = '';
+            Data.trainings.forEach(t => {
+                const row = document.createElement('tr');
+                let badge = 'badge-success';
+                if(t.status === 'Expiring Soon') badge = 'badge-warning';
+                if(t.status === 'Expired') badge = 'badge-danger';
+
+                row.innerHTML = `
+                    <td>${Utils.escapeHtml(t.employee)}</td>
+                    <td>${Utils.escapeHtml(t.role)}</td>
+                    <td>${Utils.escapeHtml(t.course)}</td>
+                    <td>${Utils.escapeHtml(t.completed)}</td>
+                    <td>${Utils.escapeHtml(t.expiry)}</td>
+                    <td><span class="badge ${badge}">${Utils.escapeHtml(t.status)}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        },
+
+        showTrainingForm: function() {
+            document.getElementById('training-form-modal').style.display = 'flex';
+        },
+
+        closeTrainingForm: function() {
+             document.getElementById('training-form-modal').style.display = 'none';
+        },
+
+        submitTraining: function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            // Calculate status based on date (simple logic)
+            const expiry = formData.get('expiry');
+            const today = new Date().toISOString().split('T')[0];
+            let status = 'Valid';
+            if (expiry < today) status = 'Expired';
+
+            const newTraining = {
+                employee: formData.get('employee'),
+                role: 'Staff', // Simplified
+                course: formData.get('course'),
+                completed: new Date().toISOString().split('T')[0], // Assumed completed today
+                expiry: expiry,
+                status: status
+            };
+
+            Data.trainings.unshift(newTraining);
+            this.renderTraining();
+            this.renderDashboard();
+            this.closeTrainingForm();
+        }
+    };
+
+    // Initialize App
+    document.addEventListener('DOMContentLoaded', () => {
+        app.init();
+    });
+</script>
+
+</body>
+</html>
