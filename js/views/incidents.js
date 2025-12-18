@@ -3,6 +3,8 @@ import {
     addIncident,
     updateIncident,
     getIncidentById,
+    addCorrectiveAction,
+    getState,
     subscribe
 } from '../store.js';
 import { Modal, Notification, validateForm } from '../utils/util.js';
@@ -113,6 +115,7 @@ function renderIncidentList(container) {
 
     // Attach Event Listeners
     document.getElementById('add-incident-btn').addEventListener('click', showAddIncidentModal);
+    document.getElementById('export-btn').addEventListener('click', exportIncidents);
 
     document.getElementById('search-input').addEventListener('input', (e) => filterIncidents(e.target.value));
     document.getElementById('filter-status').addEventListener('change', () => filterIncidents());
@@ -225,7 +228,10 @@ function renderIncidentDetail(container, id) {
                     <div class="card-body">
                         ${incident.investigation ? `
                              <div class="detail-section">
-                                <h4>Root Cause (5 Whys / Fishbone Analysis)</h4>
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4>Root Cause (5 Whys / Fishbone Analysis)</h4>
+                                    <button class="btn btn-sm btn-outline-secondary" id="edit-investigation-btn">Edit Analysis</button>
+                                </div>
                                 <div class="rca-box p-3 bg-light border rounded">
                                      <p>${incident.investigation.rootCause}</p>
                                 </div>
@@ -233,7 +239,7 @@ function renderIncidentDetail(container, id) {
                         ` : `
                             <div class="empty-state">
                                 <p>No investigation data recorded.</p>
-                                <button class="btn btn-sm btn-outline-primary">Start Investigation (Fishbone)</button>
+                                <button class="btn btn-sm btn-outline-primary" id="start-investigation-btn">Start Investigation (Fishbone)</button>
                             </div>
                         `}
                     </div>
@@ -293,7 +299,170 @@ function renderIncidentDetail(container, id) {
     container.innerHTML = html;
 
     document.getElementById('edit-incident-btn').addEventListener('click', () => showEditIncidentModal(incident.id));
-    // document.getElementById('add-action-btn').addEventListener('click', () => showAddActionModal(incident.id));
+
+    if (document.getElementById('add-action-btn')) {
+        document.getElementById('add-action-btn').addEventListener('click', () => showAddActionModal(incident.id));
+    }
+
+    if (document.getElementById('start-investigation-btn')) {
+        document.getElementById('start-investigation-btn').addEventListener('click', () => showInvestigationModal(incident.id));
+    }
+
+    if (document.getElementById('edit-investigation-btn')) {
+        document.getElementById('edit-investigation-btn').addEventListener('click', () => showInvestigationModal(incident.id));
+    }
+}
+
+function showInvestigationModal(id) {
+    const incident = getIncidentById(id);
+    if (!incident) return;
+
+    const currentRootCause = incident.investigation ? incident.investigation.rootCause : '';
+
+    const formHtml = `
+        <form id="investigation-form">
+            <div class="form-group">
+                <label>Incident</label>
+                <input type="text" class="form-control" value="${incident.title}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="inv-root-cause">Root Cause Analysis (5 Whys / Fishbone) *</label>
+                <textarea id="inv-root-cause" name="rootCause" class="form-control" rows="6" required placeholder="Describe the root cause(s) identified...">${currentRootCause}</textarea>
+                <small class="text-muted">Enter the findings from your Fishbone or 5 Whys analysis here.</small>
+            </div>
+            <div class="form-actions text-right">
+                <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Analysis</button>
+            </div>
+        </form>
+    `;
+
+    const modal = Modal.show(formHtml, { title: 'Investigation & Root Cause' });
+    document.querySelector('.modal-close-btn').addEventListener('click', () => modal.close());
+
+    document.getElementById('investigation-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const { isValid } = validateForm(form);
+
+        if (isValid) {
+            const formData = new FormData(form);
+            const rootCause = formData.get('rootCause');
+
+            const investigationData = {
+                rootCause: rootCause,
+                actions: incident.investigation ? incident.investigation.actions : []
+            };
+
+            // Update status to "Under Investigation" if it was "Reported"
+            const newStatus = incident.status === 'Reported' ? 'Under Investigation' : incident.status;
+
+            updateIncident(id, {
+                investigation: investigationData,
+                status: newStatus
+            });
+
+            Notification.show('Investigation analysis saved', { type: 'success' });
+            modal.close();
+        }
+    });
+}
+
+function showAddActionModal(incidentId) {
+    const state = getState();
+    // Filter users who can be assignees (e.g. Managers, or everyone)
+    const assignees = state.users;
+
+    const formHtml = `
+        <form id="add-action-form">
+            <div class="form-group">
+                <label for="action-desc">Action Description *</label>
+                <textarea id="action-desc" name="description" class="form-control" rows="3" required placeholder="Describe the corrective action..."></textarea>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="action-assignee">Assignee *</label>
+                        <select id="action-assignee" name="assignee" class="form-control" required>
+                            <option value="">Select User</option>
+                            ${assignees.map(u => `<option value="${u.id}">${u.name} (${u.role})</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="action-due-date">Due Date *</label>
+                        <input type="date" id="action-due-date" name="dueDate" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+             <div class="form-group">
+                <label for="action-status">Status</label>
+                <select id="action-status" name="status" class="form-control">
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+            <div class="form-actions text-right">
+                <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Action</button>
+            </div>
+        </form>
+    `;
+
+    const modal = Modal.show(formHtml, { title: 'Add Corrective Action' });
+    document.querySelector('.modal-close-btn').addEventListener('click', () => modal.close());
+
+    document.getElementById('add-action-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const { isValid } = validateForm(form);
+
+        if (isValid) {
+            const formData = new FormData(form);
+
+            const newAction = {
+                incidentId: parseInt(incidentId),
+                description: formData.get('description'),
+                assignee: parseInt(formData.get('assignee')),
+                dueDate: new Date(formData.get('dueDate')),
+                status: formData.get('status')
+            };
+
+            addCorrectiveAction(newAction);
+            Notification.show('Corrective action added', { type: 'success' });
+            modal.close();
+            // Store subscription will handle re-render of incident detail
+        }
+    });
+}
+
+function exportIncidents() {
+    const incidents = getIncidents();
+    const csvContent = "data:text/csv;charset=utf-8,"
+        + "ID,Date,Type,Title,Status,Severity,Location,Description\n"
+        + incidents.map(e => {
+            const row = [
+                e.id,
+                new Date(e.date).toISOString().split('T')[0],
+                `"${e.type}"`,
+                `"${e.title.replace(/"/g, '""')}"`,
+                e.status,
+                e.severity,
+                `"${e.location.replace(/"/g, '""')}"`,
+                `"${e.description.replace(/"/g, '""')}"`
+            ];
+            return row.join(",");
+        }).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "incidents_export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function showAddIncidentModal() {
