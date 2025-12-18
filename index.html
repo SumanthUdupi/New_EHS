@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="css/modules.css">
     <link rel="stylesheet" href="css/utils.css">
     <link rel="stylesheet" href="css/spinner.css">
+    <link rel="stylesheet" href="css/breadcrumbs.css">
+    <link rel="stylesheet" href="css/timeline.css">
 </head>
 <body>
     <!-- Skip links for accessibility -->
@@ -20,20 +22,25 @@
 
     <div class="app-container">
         <aside class="sidebar" role="complementary" aria-label="Main navigation">
-            <div class="logo" aria-label="EHS Pro logo">EHS Pro</div>
+            <div class="sidebar-header">
+                <div class="logo" aria-label="EHS Pro logo">EHS Pro</div>
+                <button id="sidebar-collapse-btn" class="sidebar-collapse-btn" aria-label="Collapse sidebar">
+                    <span class="icon-arrow-left">«</span>
+                </button>
+            </div>
             <nav class="main-nav" id="main-nav" role="navigation" aria-label="Main navigation">
                 <ul role="menubar">
-                    <li role="none"><a href="#/dashboard" class="nav-link active" role="menuitem" aria-current="page">Dashboard</a></li>
-                    <li role="none"><a href="#/incidents" class="nav-link" role="menuitem">Incident Management</a></li>
-                    <li role="none"><a href="#/risks" class="nav-link" role="menuitem">Risk Assessment</a></li>
-                    <li role="none"><a href="#/inspections" class="nav-link" role="menuitem">Inspections</a></li>
-                    <li role="none"><a href="#/audits" class="nav-link" role="menuitem">Audits</a></li>
-                    <li role="none"><a href="#/checklists" class="nav-link" role="menuitem">Checklists</a></li>
-                    <li role="none"><a href="#/compliance" class="nav-link" role="menuitem">Compliance</a></li>
-                    <li role="none"><a href="#/contractors" class="nav-link" role="menuitem">Contractors</a></li>
-                    <li role="none"><a href="#/ewp" class="nav-link" role="menuitem">Work Permits</a></li>
-                    <li role="none"><a href="#/training" class="nav-link" role="menuitem">Training</a></li>
-                    <li role="none"><a href="#/configuration" class="nav-link" role="menuitem">Configuration</a></li>
+                    <li role="none"><a href="#/dashboard" class="nav-link active" role="menuitem" aria-current="page"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a></li>
+                    <li role="none"><a href="#/incidents" class="nav-link" role="menuitem"><span class="nav-icon">⚠️</span><span class="nav-text">Incident Management</span></a></li>
+                    <li role="none"><a href="#/risks" class="nav-link" role="menuitem"><span class="nav-icon">🛡️</span><span class="nav-text">Risk Assessment</span></a></li>
+                    <li role="none"><a href="#/inspections" class="nav-link" role="menuitem"><span class="nav-icon">🔍</span><span class="nav-text">Inspections</span></a></li>
+                    <li role="none"><a href="#/audits" class="nav-link" role="menuitem"><span class="nav-icon">📋</span><span class="nav-text">Audits</span></a></li>
+                    <li role="none"><a href="#/checklists" class="nav-link" role="menuitem"><span class="nav-icon">✅</span><span class="nav-text">Checklists</span></a></li>
+                    <li role="none"><a href="#/compliance" class="nav-link" role="menuitem"><span class="nav-icon">⚖️</span><span class="nav-text">Compliance</span></a></li>
+                    <li role="none"><a href="#/contractors" class="nav-link" role="menuitem"><span class="nav-icon">👷</span><span class="nav-text">Contractors</span></a></li>
+                    <li role="none"><a href="#/ewp" class="nav-link" role="menuitem"><span class="nav-icon">🎫</span><span class="nav-text">Work Permits</span></a></li>
+                    <li role="none"><a href="#/training" class="nav-link" role="menuitem"><span class="nav-icon">🎓</span><span class="nav-text">Training</span></a></li>
+                    <li role="none"><a href="#/configuration" class="nav-link" role="menuitem"><span class="nav-icon">⚙️</span><span class="nav-text">Configuration</span></a></li>
                 </ul>
             </nav>
         </aside>
@@ -41,10 +48,22 @@
         <main class="main-content" id="main-content" role="main">
             <header class="app-header" role="banner">
                 <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
-                <h1 id="page-title" class="page-title">Dashboard</h1>
-                <div class="user-profile">
-                    <span id="current-user-name" class="user-profile__name" aria-label="Current user name"></span>
-                    <button id="logout-btn" class="btn btn-secondary btn-sm" aria-label="Log out of the system">Log Out</button>
+                <div class="title-section">
+                    <h1 id="page-title" class="page-title">Dashboard</h1>
+                    <nav aria-label="Breadcrumb" class="breadcrumb-nav">
+                        <ol id="breadcrumb-list" class="breadcrumb-list">
+                            <!-- Breadcrumbs will be inserted here -->
+                        </ol>
+                    </nav>
+                </div>
+                <div class="header-actions" style="display: flex; align-items: center; gap: var(--space-md);">
+                    <button id="theme-toggle-btn" class="btn btn-icon" aria-label="Toggle Dark Mode" title="Toggle Dark Mode">
+                        🌙
+                    </button>
+                    <div class="user-profile">
+                        <span id="current-user-name" class="user-profile__name" aria-label="Current user name"></span>
+                        <button id="logout-btn" class="btn btn-secondary btn-sm" aria-label="Log out of the system">Log Out</button>
+                    </div>
                 </div>
             </header>
             <div id="app-root" class="page-content">

@@ -81,6 +81,9 @@ export function router() {
         // Update active state on nav links
         updateNavLinks(path);
 
+        // Update breadcrumbs
+        updateBreadcrumbs(path, params, route.title);
+
     } catch (error) {
         console.error('Error rendering view:', error);
         appRoot.innerHTML = '<div class="card"><div class="card-body"><p class="text-error">Error loading page. Please try again.</p></div></div>';
@@ -101,6 +104,37 @@ function updateNavLinks(activePath) {
         link.classList.toggle('active', linkPath === activePath);
         link.setAttribute('aria-current', linkPath === activePath ? 'page' : 'false');
     });
+}
+
+/**
+ * Update breadcrumbs
+ */
+function updateBreadcrumbs(path, params, title) {
+    const breadcrumbList = document.getElementById('breadcrumb-list');
+    if (!breadcrumbList) return;
+
+    let html = '';
+
+    // Dashboard is always home
+    html += `<li class="breadcrumb-item"><a href="#/dashboard">Dashboard</a></li>`;
+
+    // Current page
+    if (path !== 'dashboard') {
+        html += `<li class="breadcrumb-item${!params.id ? ' active' : ''}">`;
+        if (params.id) {
+            html += `<a href="#/${path}">${title}</a>`;
+        } else {
+            html += `<span aria-current="page">${title}</span>`;
+        }
+        html += `</li>`;
+
+        // If detail view
+        if (params.id) {
+            html += `<li class="breadcrumb-item active"><span aria-current="page">#${params.id}</span></li>`;
+        }
+    }
+
+    breadcrumbList.innerHTML = html;
 }
 
 /**

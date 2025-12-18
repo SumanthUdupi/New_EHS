@@ -1,0 +1,39 @@
+/* Breadcrumbs */
+.breadcrumb-nav {
+    font-size: var(--font-size-sm);
+    color: var(--text-color-light);
+    margin-top: var(--space-xs);
+}
+
+.breadcrumb-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    margin: 0 var(--space-xs);
+    color: var(--text-color-light);
+}
+
+.breadcrumb-item a {
+    color: var(--text-color-light);
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-color);
+    font-weight: var(--font-weight-medium);
+}

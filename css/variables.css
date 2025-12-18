@@ -65,3 +65,36 @@
     --z-index-modal: 1050;
     --z-index-tooltip: 1100;
 }
+
+/* Dark Mode Theme */
+body.dark-mode {
+    --primary-color: #4c9aff;
+    --primary-color-dark: #2684ff;
+    --primary-color-light: #0d1e3a; /* Very dark blue for backgrounds */
+
+    --secondary-color: #ffc400;
+    --secondary-color-dark: #ffab00;
+    --secondary-color-light: #332700; /* Dark yellow/brown */
+
+    --text-color: #e6e9ef;
+    --text-color-light: #b3bac5;
+    --text-color-on-primary: #ffffff;
+
+    --background-color: #1b263b; /* Dark Navy */
+    --surface-color: #24344d; /* Lighter Navy for cards */
+    --border-color: #354a6d;
+
+    --success-color: #57d9a3;
+    --warning-color: #ffc400;
+    --danger-color: #ff7452;
+    --info-color: #00c7e6;
+
+    --success-color-light: #0a2b1d;
+    --warning-color-light: #332700;
+    --danger-color-light: #330c05;
+    --info-color-light: #002c33;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}

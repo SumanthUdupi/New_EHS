@@ -177,6 +177,36 @@ function renderIncidentDetail(container, id) {
                         </div>
 
                         <div class="detail-section">
+                            <h3>Status Timeline</h3>
+                            <ul class="timeline">
+                                <li class="timeline-item ${['Reported', 'Under Investigation', 'Closed'].includes(incident.status) ? 'completed' : ''}">
+                                    <span class="timeline-marker"></span>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">Reported</div>
+                                        <div class="timeline-date">${new Date(incident.date).toLocaleDateString()}</div>
+                                        <div class="timeline-description">Incident reported.</div>
+                                    </div>
+                                </li>
+                                <li class="timeline-item ${['Under Investigation', 'Closed'].includes(incident.status) ? 'completed' : ''}">
+                                    <span class="timeline-marker"></span>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">Under Investigation</div>
+                                        <div class="timeline-date">${incident.status === 'Reported' ? 'Pending' : 'In Progress'}</div>
+                                        <div class="timeline-description">Investigation initiated.</div>
+                                    </div>
+                                </li>
+                                <li class="timeline-item ${['Closed'].includes(incident.status) ? 'completed' : ''}">
+                                    <span class="timeline-marker"></span>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">Closed</div>
+                                        <div class="timeline-date">${incident.status === 'Closed' ? 'Completed' : 'Pending'}</div>
+                                        <div class="timeline-description">Incident closed and actions verified.</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="detail-section">
                             <h3>Investigation Team</h3>
                              <ul>
                                 ${incident.involvedNames && incident.involvedNames.length > 0 ?
@@ -366,14 +396,73 @@ function showAddIncidentModal() {
         }
     });
 
+    // AI-Powered Categorization (Simulation)
+    const descInput = document.getElementById('inc-desc');
+    descInput.addEventListener('blur', () => {
+        const text = descInput.value.toLowerCase();
+        if (text.length < 5) return;
+
+        let suggestedType = '';
+        let suggestedSeverity = '';
+        let suggestedCategory = '';
+
+        // Simple keyword matching rules
+        if (text.includes('fall') || text.includes('slip') || text.includes('trip')) {
+            suggestedCategory = 'Slip/Trip/Fall';
+            suggestedType = 'Incident';
+        } else if (text.includes('fire') || text.includes('smoke') || text.includes('burn')) {
+            suggestedCategory = 'Fire';
+            suggestedType = 'Incident';
+        } else if (text.includes('chemical') || text.includes('spill') || text.includes('fume')) {
+            suggestedCategory = 'Chemical';
+        }
+
+        if (text.includes('hospital') || text.includes('ambulance') || text.includes('broken') || text.includes('fracture')) {
+            suggestedSeverity = 'Recordable';
+        } else if (text.includes('death') || text.includes('fatal') || text.includes('died')) {
+            suggestedSeverity = 'Fatality/Serious';
+        } else if (text.includes('band-aid') || text.includes('cut') || text.includes('bruise')) {
+            suggestedSeverity = 'First Aid';
+        }
+
+        // Apply suggestions if fields are empty
+        if (suggestedType && typeSelect.value === '') {
+            typeSelect.value = suggestedType;
+            typeSelect.dispatchEvent(new Event('change'));
+            Notification.show('AI Suggestion: Type set to ' + suggestedType, { type: 'info', duration: 3000 });
+        }
+        if (suggestedCategory && categorySelect.value === '') {
+            categorySelect.value = suggestedCategory;
+            Notification.show('AI Suggestion: Category set to ' + suggestedCategory, { type: 'info', duration: 3000 });
+        }
+        const severitySelect = document.getElementById('inc-severity');
+        if (suggestedSeverity && severitySelect.value === '') {
+            severitySelect.value = suggestedSeverity;
+            Notification.show('AI Suggestion: Severity set to ' + suggestedSeverity, { type: 'info', duration: 3000 });
+        }
+    });
+
     // Handle Location Button
     document.getElementById('btn-get-location').addEventListener('click', () => {
         const locInput = document.getElementById('inc-location');
         locInput.value = "Fetching location...";
-        setTimeout(() => {
-             // Simulate GPS coordinates
-            locInput.value = "Lat: 34.0522, Long: -118.2437";
-        }, 800);
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    locInput.value = `Lat: ${latitude.toFixed(6)}, Long: ${longitude.toFixed(6)}`;
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                    locInput.value = "Error: Could not retrieve location.";
+                    Notification.show('Could not retrieve location. Ensure GPS is enabled.', { type: 'error' });
+                },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            );
+        } else {
+            locInput.value = "Error: Geolocation not supported.";
+        }
     });
 
     // Wire up close button manually since it's inside the form

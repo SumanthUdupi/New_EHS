@@ -16,11 +16,69 @@
     transition: transform var(--transition-medium);
 }
 
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+}
+
 .sidebar .logo {
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
     color: var(--primary-color);
-    margin-bottom: var(--space-xl);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar-collapse-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color-light);
+    font-size: var(--font-size-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-collapse-btn:hover {
+    color: var(--primary-color);
+}
+
+/* Collapsed Sidebar State */
+body.sidebar-collapsed .sidebar {
+    width: 60px;
+    padding: var(--space-md);
+}
+
+body.sidebar-collapsed .sidebar .logo {
+    display: none;
+}
+
+body.sidebar-collapsed .sidebar .sidebar-collapse-btn .icon-arrow-left {
+    transform: rotate(180deg);
+}
+
+body.sidebar-collapsed .sidebar .nav-link {
+    text-align: center;
+    padding: var(--space-sm) 0;
+    justify-content: center;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.nav-icon {
+    font-size: var(--font-size-lg);
+    min-width: 20px;
+}
+
+body.sidebar-collapsed .sidebar .nav-text {
+    display: none;
 }
 
 .main-content {
