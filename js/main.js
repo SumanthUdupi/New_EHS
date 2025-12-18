@@ -19,8 +19,10 @@ function App() {
         }
         document.getElementById('logout-btn').addEventListener('click', logout);
 
-        // 2. Setup Mobile Menu Toggle
+        // 2. Setup Mobile Menu Toggle & Sidebar Collapse & Theme Toggle
         setupMobileMenu();
+        setupSidebarCollapse();
+        setupThemeToggle();
 
         // 3. Setup Router
         window.addEventListener('hashchange', router);
@@ -64,6 +66,42 @@ function App() {
                     sidebarOverlay.classList.remove('active');
                     menuToggle.setAttribute('aria-expanded', 'false');
                 }
+            });
+        }
+    }
+
+    /**
+     * Setup sidebar collapse functionality
+     */
+    function setupSidebarCollapse() {
+        const collapseBtn = document.getElementById('sidebar-collapse-btn');
+        if (collapseBtn) {
+            collapseBtn.addEventListener('click', () => {
+                document.body.classList.toggle('sidebar-collapsed');
+            });
+        }
+    }
+
+    /**
+     * Setup theme toggle functionality (Dark Mode)
+     */
+    function setupThemeToggle() {
+        const themeBtn = document.getElementById('theme-toggle-btn');
+        const savedTheme = localStorage.getItem('theme');
+
+        // Apply saved theme
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            if (themeBtn) themeBtn.textContent = '☀️';
+        }
+
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+
+                themeBtn.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
             });
         }
     }
