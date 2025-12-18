@@ -15,7 +15,7 @@ import { renderConfigurationView } from './views/configuration.js';
 // Maps URL hash to a view function and a page title.
 const routes = {
     'dashboard': { view: DashboardView, title: 'Dashboard' },
-    'incidents': { view: (params) => renderIncidents(document.getElementById('app-root'), params), title: 'Incident Management' },
+    'incidents': { view: (params) => renderIncidents(params), title: 'Incident Management' },
     'risks': { view: (params) => renderRisks(document.getElementById('app-root'), params), title: 'Risk Assessment' },
     'inspections': { view: () => renderInspectionsView(), title: 'Inspections' },
     'audits': { view: () => renderAuditsView(), title: 'Audits' },
