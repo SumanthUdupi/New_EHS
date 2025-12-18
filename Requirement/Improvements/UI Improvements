@@ -1,0 +1,64 @@
+### **General Layout & Navigation**
+
+1. **Sidebar Collapsible State:** Add a toggle to collapse the sidebar to icons-only to maximize workspace.
+2. **Breadcrumb Navigation:** Implement dynamic breadcrumbs (e.g., `Dashboard > Incidents > #101`) to help users orient themselves.
+3. **Active Link Highlighting:** Ensure the `.active` class in `main-nav` applies to parent categories if sub-navigation is added.
+4. **Dark Mode Support:** Use the existing `variables.css` to define a dark theme palette.
+5. **User Avatar:** Add a small profile picture next to the user name in the header for a more personalized feel.
+6. **Search Shortcut:** Implement a global search bar in the header with a keyboard shortcut like `Ctrl + K`.
+7. **Footer Information:** Add a footer with version numbers and quick links to help/support.
+8. **Sidebar Tooltips:** Show tooltips on hover when the sidebar is in a collapsed state.
+9. **Logo Animation:** Add a subtle transition or hover effect to the "EHS Pro" logo.
+10. **Custom Scrollbars:** Style scrollbars in `layout.css` to match the professional blue theme.
+
+### **Dashboard & Data Visualization**
+
+11. **Interactive Charts:** Allow users to click chart segments (e.g., in the Risk Profile) to filter the underlying data list.
+12. **KPI Comparison:** Show "percentage change" indicators (e.g., +5% vs last month) on KPI cards.
+13. **Real-time Clock:** Add a local/system time display in the header for time-sensitive incident reporting.
+14. **Customizable Widgets:** Allow users to drag and drop dashboard cards to reorder them.
+15. **Chart Export:** Add buttons to export charts directly as PNG/PDF from the dashboard.
+16. **Empty State Illustrations:** Replace "No incidents found" text with friendly illustrations.
+17. **Loading Skeletons:** Use skeleton screens instead of the generic spinner for a perceived speed boost.
+18. **Legend Interaction:** Allow toggling visibility of datasets by clicking items in the chart legend.
+19. **Trend Sparklines:** Add small trend lines inside KPI cards for immediate context.
+20. **Dashboard Filters:** Add a global date range picker (e.g., "Last 30 Days") to the main dashboard.
+
+### **Incident Management**
+
+21. **Visual Severity:** Use colored dots or vertical bars next to incident IDs in the table for quick scanning.
+22. **Bulk Actions:** Add checkboxes to the incident table to allow bulk status updates or exports.
+23. **Incident Timeline:** In the detail view, show a vertical timeline of updates (Reported -> Investigating -> Closed).
+24. **Drag & Drop Upload:** Enable dragging files directly onto the "Photos/Media" field in the modal.
+25. **Photo Preview:** Show thumbnails of attached photos in the table or a hover preview.
+26. **Auto-save:** Implement auto-save on the incident form to prevent data loss during long descriptions.
+27. **Location Map:** Integrate a small map (e.g., Leaflet or Google Maps) to pin exact locations.
+28. **Mention System:** Allow `@` mentions in descriptions to notify specific team members.
+29. **Rich Text Editing:** Use a lightweight editor for descriptions to allow bolding and lists.
+30. **Status Tooltips:** Explain what each status means (e.g., "Under Investigation" requirements) on hover.
+
+### **Risk Assessment & Audits**
+
+31. **Risk Heatmap:** Display a 5x5 color-coded matrix that users can click to see relevant risks.
+32. **Risk History:** Show how a specific risk score has changed over time in the detail view.
+33. **Audit Progress Bar:** Show a visual progress bar (e.g., "7/10 tasks completed") for active audits.
+34. **Auditor Avatars:** Display the lead auditor's initials/image in the audit table.
+35. **One-click Review:** Add a "Mark as Reviewed" button to quickly update Adequate risks.
+36. **Matrix Legend:** Add a permanent legend explaining Likelihood/Severity scores (1-5) on the page.
+37. **Audit Reminders:** Highlight "Planned" audits that are overdue with a red border.
+38. **Print View:** Create a "Print Optimized" CSS media query for audit reports.
+39. **Risk Scoring Preview:** Dynamically calculate and display the score in the modal as the user types numbers.
+40. **Filtering Chips:** Show active filters as removable "chips" above the table.
+
+### **Accessibility & Refinement**
+
+41. **Focus Rings:** Improve the contrast of the focus ring for keyboard-only users.
+42. **Form Validation Messages:** Use the `.form-error` class to provide specific feedback (e.g., "Title must be 5+ chars").
+43. **Toast Durations:** allow notifications to stay longer if they contain critical errors.
+44. **Button Loading States:** Disable buttons and show a tiny spinner inside them after clicking "Save".
+45. **Responsive Tables:** Use a "card-based" layout for tables on screens smaller than 480px.
+46. **Consistent Gaps:** Audit the use of `--space-md` vs `--space-lg` to ensure perfect vertical rhythm.
+47. **Tab Order:** Ensure the modal focus stays trapped within the modal when open.
+48. **Dynamic Page Titles:** Update the browser tab title (e.g., "Editing Incident #101") as the view changes.
+49. **Action Confirmation:** Add a "Are you sure?" confirmation modal for deletions or sensitive status changes.
+50. **System Feedback:** Add a "Copy to Clipboard" button for incident IDs or GPS coordinates.
