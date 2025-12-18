@@ -1,0 +1,204 @@
+/*
+This file will contain styles for specific EHS modules.
+For example:
+- Incident Management specific styles
+- Risk Assessment specific styles
+- etc.
+*/
+
+/* Page Header for buttons and filters */
+.page-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--space-lg);
+}
+
+/* Data Table Styles */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table thead th {
+    font-weight: var(--font-weight-bold);
+    color: var(--text-color-light);
+    background-color: var(--background-color);
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--primary-color-light);
+    cursor: pointer;
+}
+
+/* Status Badge Styles */
+.status-badge {
+    display: inline-block;
+    padding: var(--space-xxs) var(--space-xs);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--border-radius-lg);
+    text-transform: capitalize;
+}
+
+.status-closed {
+    color: var(--success-color);
+    background-color: var(--success-color-light);
+}
+
+.status-under-investigation {
+    color: var(--info-color);
+    background-color: var(--info-color-light);
+}
+
+.status-reported {
+    color: var(--warning-color);
+    background-color: var(--warning-color-light);
+}
+
+.status-in-progress {
+    color: var(--secondary-color);
+    background-color: var(--secondary-color-light);
+}
+
+.status-pending {
+    color: var(--text-color-light);
+    background-color: var(--background-color);
+}
+
+.status-completed {
+    color: var(--success-color);
+    background-color: var(--success-color-light);
+}
+
+/* Risk Matrix Styles */
+.risk-matrix-grid {
+    display: grid;
+    grid-template-columns: 1fr repeat(5, 1fr);
+    grid-template-rows: auto repeat(5, 1fr);
+    gap: 4px;
+    margin-top: var(--space-md);
+}
+
+.matrix-label {
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    padding: var(--space-xs);
+}
+
+.severity-label {
+    border-bottom: 2px solid var(--border-color);
+}
+
+.likelihood-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    border-right: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.matrix-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: white;
+    background-color: rgba(0,0,0,0.05); /* Default for empty cells */
+}
+
+.matrix-cell span {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.risk-low {
+    background-color: #36b37e; /* success-color */
+}
+.risk-medium {
+    background-color: #ffab00; /* warning-color */
+}
+.risk-high {
+    background-color: #ff7428; /* A more orange-red */
+}
+.risk-critical {
+    background-color: #de350b; /* danger-color */
+}
+
+/* New Status for Training */
+.status-critical {
+    color: var(--danger-color);
+    background-color: var(--danger-color-light);
+}
+
+/* Competency Matrix Styles */
+.competency-check {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    font-weight: bold;
+    color: white;
+}
+
+.competency-check.active {
+    background-color: var(--success-color);
+}
+
+.competency-check.expiring {
+    background-color: var(--warning-color);
+}
+
+.competency-check.expired {
+    background-color: var(--danger-color);
+}
+
+/* Dashboard Styles */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-md);
+    background-color: var(--background-color);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-sm);
+}
+
+.metric-value {
+    font-size: var(--font-size-xxl);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.metric-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-color-light);
+    margin-top: var(--space-xs);
+    text-align: center;
+}

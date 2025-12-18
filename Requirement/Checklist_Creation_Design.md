@@ -57,7 +57,7 @@ The system employs event-driven patterns for resilience and real-time updates:
 - Saga patterns manage complex workflows, such as checklist approval chains.
 
 ```mermaid
-graph TD
+flowchart TD
     A[User Initiates Creation] --> B[Builder Service]
     B --> C[Event: DraftGenerated]
     C --> D[Management Service]
