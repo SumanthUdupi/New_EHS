@@ -13,7 +13,7 @@ let unsubscribe;
 export function renderIncidents(params) {
     // Return a placeholder container
     setTimeout(() => {
-        const container = document.getElementById('app-root');
+        const container = document.getElementById('incidents-view-container');
         if (container) initializeIncidents(container, params);
     }, 0);
     return '<div id="incidents-view-container"><div class="spinner-container"><div class="spinner"></div></div></div>';
@@ -161,7 +161,7 @@ function renderIncidentDetail(container, id) {
                         </div>
                         <div class="detail-row">
                             <label>Type:</label>
-                            <span>${incident.type}</span>
+                            <span>${incident.type} ${incident.category ? ` - ${incident.category}` : ''}</span>
                         </div>
                         <div class="detail-row">
                             <label>Severity:</label>
@@ -176,36 +176,44 @@ function renderIncidentDetail(container, id) {
                             <p>${incident.description}</p>
                         </div>
 
-                        ${incident.involvedNames && incident.involvedNames.length > 0 ? `
                         <div class="detail-section">
-                            <h3>People Involved</h3>
-                            <ul>
-                                ${incident.involvedNames.map(name => `<li>${name}</li>`).join('')}
+                            <h3>Investigation Team</h3>
+                             <ul>
+                                ${incident.involvedNames && incident.involvedNames.length > 0 ?
+                                    incident.involvedNames.map(name => `<li>${name}</li>`).join('') :
+                                    '<li>Investigation pending assignment</li>'
+                                }
                             </ul>
                         </div>
-                        ` : ''}
                     </div>
                 </div>
 
-                ${incident.investigation ? `
                 <div class="card mt-4">
                     <div class="card-header">
-                        <h3 class="card-title">Investigation Details</h3>
+                        <h3 class="card-title">Investigation & Root Cause Analysis</h3>
                     </div>
                     <div class="card-body">
-                        <div class="detail-section">
-                            <h4>Root Cause Analysis</h4>
-                            <p>${incident.investigation.rootCause}</p>
-                        </div>
+                        ${incident.investigation ? `
+                             <div class="detail-section">
+                                <h4>Root Cause (5 Whys / Fishbone Analysis)</h4>
+                                <div class="rca-box p-3 bg-light border rounded">
+                                     <p>${incident.investigation.rootCause}</p>
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="empty-state">
+                                <p>No investigation data recorded.</p>
+                                <button class="btn btn-sm btn-outline-primary">Start Investigation (Fishbone)</button>
+                            </div>
+                        `}
                     </div>
                 </div>
-                ` : ''}
             </div>
 
             <div class="col-span-1">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Corrective Actions</h3>
+                        <h3 class="card-title">Corrective Actions (CAPA)</h3>
                     </div>
                     <div class="card-body">
                         ${incident.actions && incident.actions.length > 0 ? `
@@ -231,11 +239,20 @@ function renderIncidentDetail(container, id) {
                     </div>
                     <div class="card-body">
                          <div class="attachment-list">
-                            <!-- Placeholder for attachments -->
-                            <div class="attachment-item">
-                                <span class="file-icon">📷</span>
-                                <span class="file-name">scene_photo_01.jpg</span>
-                            </div>
+                            ${incident.photos && incident.photos.length > 0 ?
+                                incident.photos.map(photo => `
+                                    <div class="attachment-item">
+                                        <span class="file-icon">📷</span>
+                                        <span class="file-name">${photo}</span>
+                                    </div>
+                                `).join('')
+                            : `
+                                <!-- Placeholder for attachments if none -->
+                                <div class="attachment-item">
+                                    <span class="file-icon">📷</span>
+                                    <span class="file-name">scene_photo_01.jpg (Example)</span>
+                                </div>
+                            `}
                          </div>
                     </div>
                 </div>
@@ -268,13 +285,26 @@ function showAddIncidentModal() {
                         <label for="inc-type">Type *</label>
                         <select id="inc-type" name="type" class="form-control" required>
                             <option value="">Select Type</option>
+                            <option value="Incident">Incident</option>
+                            <option value="Near Miss">Near Miss</option>
+                            <option value="Observation">Observation</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="inc-category-group" style="display: none;">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="inc-category">Category *</label>
+                        <select id="inc-category" name="category" class="form-control">
+                            <option value="">Select Category</option>
                             <option value="Slip/Trip/Fall">Slip/Trip/Fall</option>
                             <option value="Equipment">Equipment</option>
                             <option value="Chemical">Chemical</option>
                             <option value="Ergonomic">Ergonomic</option>
-                            <option value="Near-miss">Near-miss</option>
                             <option value="Fire">Fire</option>
                             <option value="Vehicle">Vehicle</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                 </div>
@@ -289,16 +319,24 @@ function showAddIncidentModal() {
                             <option value="Medical Treatment">Medical Treatment</option>
                             <option value="Recordable">Recordable</option>
                             <option value="Fatality/Serious">Fatality/Serious</option>
-                            <option value="N/A">N/A (for Near-miss)</option>
+                            <option value="N/A">N/A (for Near Miss/Observation)</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label for="inc-location">Location *</label>
-                        <input type="text" id="inc-location" name="location" class="form-control" required>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="inc-location" name="location" class="form-control" style="flex: 1;" required placeholder="GPS Coordinates or Address">
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-get-location">Get Location</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div class="form-group">
+                <label for="inc-photos">Photos / Media</label>
+                <input type="file" id="inc-photos" name="photos" class="form-control" multiple accept="image/*,video/*">
+                <small class="text-muted">Select photos to upload (Simulation only)</small>
             </div>
             <div class="form-group">
                 <label for="inc-desc">Description *</label>
@@ -313,6 +351,31 @@ function showAddIncidentModal() {
 
     const modal = Modal.show(formHtml, { title: 'Report New Incident' });
 
+    // Handle Type change to show/hide Category
+    const typeSelect = document.getElementById('inc-type');
+    const categoryGroup = document.getElementById('inc-category-group');
+    const categorySelect = document.getElementById('inc-category');
+
+    typeSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'Incident' || e.target.value === 'Near Miss') {
+            categoryGroup.style.display = 'block';
+            categorySelect.required = true;
+        } else {
+            categoryGroup.style.display = 'none';
+            categorySelect.required = false;
+        }
+    });
+
+    // Handle Location Button
+    document.getElementById('btn-get-location').addEventListener('click', () => {
+        const locInput = document.getElementById('inc-location');
+        locInput.value = "Fetching location...";
+        setTimeout(() => {
+             // Simulate GPS coordinates
+            locInput.value = "Lat: 34.0522, Long: -118.2437";
+        }, 800);
+    });
+
     // Wire up close button manually since it's inside the form
     document.querySelector('.modal-close-btn').addEventListener('click', () => modal.close());
 
@@ -323,13 +386,18 @@ function showAddIncidentModal() {
 
         if (isValid) {
             const formData = new FormData(form);
+            const photosInput = document.getElementById('inc-photos');
+            const photoFiles = Array.from(photosInput.files).map(f => f.name);
+
             const newIncident = {
                 title: formData.get('title'),
                 date: new Date(formData.get('date')),
                 type: formData.get('type'),
+                category: formData.get('category') || '', // Capture category
                 severity: formData.get('severity'),
                 location: formData.get('location'),
                 description: formData.get('description'),
+                photos: photoFiles, // Store file names
                 status: 'Reported',
                 involved: [], // Todo: implement multi-select for users
                 createdDate: new Date()
