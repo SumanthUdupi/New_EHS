@@ -219,13 +219,16 @@ export class FishboneModal {
             causeGroup.appendChild(causeFo);
 
             // Delete button for the cause
-            const deleteBtn = createSvgElement('g', { class: 'delete-cause-btn', style: 'cursor: pointer; opacity: 0.2;' });
+            const deleteBtn = createSvgElement('g', { class: 'delete-cause-btn', style: 'cursor: pointer; opacity: 0;' });
             deleteBtn.appendChild(createSvgElement('circle', { cx: cX + causeLen, cy: cY, r: 7, fill: '#E53935' }));
             const cross = createSvgElement('text', { x: cX + causeLen, y: cY + 4, 'text-anchor': 'middle', fill: 'white', 'font-size': 11, 'font-weight': 'bold' });
             cross.textContent = 'x';
             deleteBtn.appendChild(cross);
-            deleteBtn.addEventListener('mouseenter', () => deleteBtn.style.opacity = '1');
-            deleteBtn.addEventListener('mouseleave', () => deleteBtn.style.opacity = '0.2');
+
+            // Show delete button on hovering the cause group
+            causeGroup.addEventListener('mouseenter', () => deleteBtn.style.opacity = '1');
+            causeGroup.addEventListener('mouseleave', () => deleteBtn.style.opacity = '0');
+
             deleteBtn.addEventListener('click', () => this.deleteCause(category.id, index));
             causeGroup.appendChild(deleteBtn);
 
