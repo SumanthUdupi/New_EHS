@@ -216,4 +216,22 @@ export function updateRiskAssessment(id, updates) {
     }
 }
 
+export function updateIncidentInvestigation(id, type, data) {
+    const incident = state.incidents.find(i => i.id === parseInt(id));
+    if (incident) {
+        if (!incident.investigation) {
+            incident.investigation = {};
+        }
+        incident.investigation[type] = data;
+
+        // If Root Cause is derived from these tools, update the main rootCause field too
+        if (type === 'fiveWhys' && data.rootCause) {
+             incident.investigation.rootCause = data.rootCause;
+        }
+
+        saveState();
+        notifyListeners();
+    }
+}
+
 // TODO: Add functions for updating, deleting data
