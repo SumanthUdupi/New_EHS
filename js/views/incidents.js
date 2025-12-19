@@ -2,12 +2,15 @@ import {
     getIncidents,
     addIncident,
     updateIncident,
+    updateIncidentInvestigation,
     getIncidentById,
     addCorrectiveAction,
     getState,
     subscribe
 } from '../store.js';
 import { Modal, Notification, validateForm } from '../utils/util.js';
+import { FishboneModal } from '../components/fishbone.js';
+import { FiveWhysModal } from '../components/five_whys.js';
 
 // Subscribe to store changes to re-render the list if needed
 let unsubscribe;
@@ -226,22 +229,23 @@ function renderIncidentDetail(container, id) {
                         <h3 class="card-title">Investigation & Root Cause Analysis</h3>
                     </div>
                     <div class="card-body">
-                        ${incident.investigation ? `
-                             <div class="detail-section">
-                                <div class="flex justify-between items-center mb-2">
-                                    <h4>Root Cause (5 Whys / Fishbone Analysis)</h4>
-                                    <button class="btn btn-sm btn-outline-secondary" id="edit-investigation-btn">Edit Analysis</button>
-                                </div>
+                        <div class="investigation-tools mb-4" style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline-primary" id="btn-fishbone">
+                                ${incident.investigation?.fishbone ? 'Edit Fishbone Diagram' : 'Create Fishbone Diagram'}
+                            </button>
+                            <button class="btn btn-outline-primary" id="btn-five-whys">
+                                ${incident.investigation?.fiveWhys ? 'Edit 5 Whys Analysis' : 'Start 5 Whys Analysis'}
+                            </button>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>Root Cause Summary</h4>
+                            ${incident.investigation?.rootCause ? `
                                 <div class="rca-box p-3 bg-light border rounded">
                                      <p>${incident.investigation.rootCause}</p>
                                 </div>
-                            </div>
-                        ` : `
-                            <div class="empty-state">
-                                <p>No investigation data recorded.</p>
-                                <button class="btn btn-sm btn-outline-primary" id="start-investigation-btn">Start Investigation (Fishbone)</button>
-                            </div>
-                        `}
+                            ` : '<p class="text-muted">No root cause identified yet.</p>'}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -304,68 +308,30 @@ function renderIncidentDetail(container, id) {
         document.getElementById('add-action-btn').addEventListener('click', () => showAddActionModal(incident.id));
     }
 
-    if (document.getElementById('start-investigation-btn')) {
-        document.getElementById('start-investigation-btn').addEventListener('click', () => showInvestigationModal(incident.id));
+    if (document.getElementById('btn-fishbone')) {
+        document.getElementById('btn-fishbone').addEventListener('click', () => {
+             const currentIncident = getIncidentById(id);
+             new FishboneModal(id, currentIncident.investigation?.fishbone, (data) => {
+                 updateIncidentInvestigation(id, 'fishbone', data);
+                 // Also ensure status is updated
+                 if (currentIncident.status === 'Reported') {
+                     updateIncident(id, { status: 'Under Investigation' });
+                 }
+             }).render();
+        });
     }
 
-    if (document.getElementById('edit-investigation-btn')) {
-        document.getElementById('edit-investigation-btn').addEventListener('click', () => showInvestigationModal(incident.id));
+    if (document.getElementById('btn-five-whys')) {
+        document.getElementById('btn-five-whys').addEventListener('click', () => {
+             const currentIncident = getIncidentById(id);
+             new FiveWhysModal(id, currentIncident.investigation?.fiveWhys, (data) => {
+                 updateIncidentInvestigation(id, 'fiveWhys', data);
+                 if (currentIncident.status === 'Reported') {
+                     updateIncident(id, { status: 'Under Investigation' });
+                 }
+             }).render();
+        });
     }
-}
-
-function showInvestigationModal(id) {
-    const incident = getIncidentById(id);
-    if (!incident) return;
-
-    const currentRootCause = incident.investigation ? incident.investigation.rootCause : '';
-
-    const formHtml = `
-        <form id="investigation-form">
-            <div class="form-group">
-                <label>Incident</label>
-                <input type="text" class="form-control" value="${incident.title}" disabled>
-            </div>
-            <div class="form-group">
-                <label for="inv-root-cause">Root Cause Analysis (5 Whys / Fishbone) *</label>
-                <textarea id="inv-root-cause" name="rootCause" class="form-control" rows="6" required placeholder="Describe the root cause(s) identified...">${currentRootCause}</textarea>
-                <small class="text-muted">Enter the findings from your Fishbone or 5 Whys analysis here.</small>
-            </div>
-            <div class="form-actions text-right">
-                <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Analysis</button>
-            </div>
-        </form>
-    `;
-
-    const modal = Modal.show(formHtml, { title: 'Investigation & Root Cause' });
-    document.querySelector('.modal-close-btn').addEventListener('click', () => modal.close());
-
-    document.getElementById('investigation-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const { isValid } = validateForm(form);
-
-        if (isValid) {
-            const formData = new FormData(form);
-            const rootCause = formData.get('rootCause');
-
-            const investigationData = {
-                rootCause: rootCause,
-                actions: incident.investigation ? incident.investigation.actions : []
-            };
-
-            // Update status to "Under Investigation" if it was "Reported"
-            const newStatus = incident.status === 'Reported' ? 'Under Investigation' : incident.status;
-
-            updateIncident(id, {
-                investigation: investigationData,
-                status: newStatus
-            });
-
-            Notification.show('Investigation analysis saved', { type: 'success' });
-            modal.close();
-        }
-    });
 }
 
 function showAddActionModal(incidentId) {
